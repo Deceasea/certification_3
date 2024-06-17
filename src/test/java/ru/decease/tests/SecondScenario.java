@@ -1,19 +1,17 @@
 package ru.decease.tests;
 
-import com.codeborne.selenide.Configuration;
 import io.qameta.allure.*;
+import org.junit.jupiter.api.Test;
 import ru.decease.config.Config;
 import ru.decease.pages.BooksPage;
 import ru.decease.pages.LoginPage;
 import ru.decease.pages.ProfilePage;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Epic("Books Tests")
 @Feature("Books Management")
-public class SecondScenario extends BaseTest{
+public class SecondScenario extends BaseTest {
 
     @Test
     @Story("User adds books to collection")
