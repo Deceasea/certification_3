@@ -35,7 +35,6 @@ public class SecondScenario extends BaseTest {
                 .addBookToCollection("Speaking JavaScript")
                 .addBookToCollection("You Don't Know JS")
                 .addBookToCollection("Programming JavaScript Applications");
-
         ProfilePage profilePage = new ProfilePage();
         profilePage.open();
 
