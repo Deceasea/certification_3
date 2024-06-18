@@ -4,11 +4,18 @@ import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Description;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriver;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class ProfilePage {
+
+    private WebDriver driver;
+
+    public ProfilePage(WebDriver driver) {
+        this.driver = driver;
+    }
 
     @Description("Check if the table is empty on the Profile page")
     public boolean isTableEmpty() {

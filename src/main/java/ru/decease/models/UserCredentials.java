@@ -4,8 +4,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class UserCredentials {
+    private String loginName;
+    private String secretCode;
 
     public UserCredentials(String loginName, String secretCode) {
+        this.loginName = loginName;
+        this.secretCode = secretCode;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public String getSecretCode() {
+        return secretCode;
     }
 
     public static class BookInfo {

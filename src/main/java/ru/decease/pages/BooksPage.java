@@ -3,6 +3,7 @@ package ru.decease.pages;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Description;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +15,12 @@ import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 
 public class BooksPage {
 
+    private WebDriver driver;
+
+    public BooksPage(WebDriver driver) {
+        this.driver = driver;
+    }
+
     @Description("Add books to the collection")
     public void addBooksToCollection(int count) {
         for (int i = 0; i < count; i++) {
@@ -24,7 +31,6 @@ public class BooksPage {
     }
 
     private void confirmAlert() {
-        // Handle confirmation modal dialog if needed
         switchTo().alert().accept();
     }
 
@@ -43,8 +49,7 @@ public class BooksPage {
     @Description("Click on Book Store")
     public void clickOnBookStore() {
         SelenideElement menuItem = $$(".btn.btn-light").get(30);
-
-        ((JavascriptExecutor) getWebDriver()).executeScript("arguments[0].scrollIntoView(true);", menuItem);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", menuItem);
         menuItem.click();
     }
 }

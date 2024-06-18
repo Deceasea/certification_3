@@ -14,8 +14,8 @@ public class APIService {
     private static String password;
 
     public APIService(String login, String password) {
-        this.login = login;
-        this.password = password;
+        APIService.login = login;
+        APIService.password = password;
         fetchUserId();
     }
 
@@ -32,7 +32,7 @@ public class APIService {
                 .path("userId");
     }
 
-    @Description("Add specified number of books to user profile v")
+    @Description("Add specified number of books to user profile")
     public static void addBooksToUserProfile(Collection<String> isbnList) {
         given()
                 .auth()
@@ -45,7 +45,7 @@ public class APIService {
                 .post(ConfigLoader.getBaseUrl() + "/BookStore/v1/Books");
     }
 
-    @Description("Delete all books from user profile ")
+    @Description("Delete all books from user profile")
     public void deleteAllBooksFromUserProfile() {
         given()
                 .auth()

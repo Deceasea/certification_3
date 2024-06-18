@@ -3,6 +3,7 @@ package ru.decease.pages;
 import com.codeborne.selenide.Selenide;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
+import org.openqa.selenium.WebDriver;
 
 import java.util.Arrays;
 
@@ -10,6 +11,12 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.page;
 
 public class LoginPage {
+
+    private WebDriver driver;
+
+    public LoginPage(WebDriver driver) {
+        this.driver = driver;
+    }
 
     @Description("Open the login page")
     public LoginPage open() {
@@ -41,5 +48,4 @@ public class LoginPage {
         Allure.addAttachment(name, "image/png", Arrays.toString(screenshot));
         return screenshot;
     }
-
 }

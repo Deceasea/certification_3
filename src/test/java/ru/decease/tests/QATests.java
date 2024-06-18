@@ -11,6 +11,9 @@ import ru.decease.pages.ProfilePage;
 import ru.decease.utils.APIService;
 import ru.decease.utils.ConfigLoader;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 
 import static io.qameta.allure.Allure.step;
@@ -26,23 +29,31 @@ public class QATests {
     private LoginPage login;
     private ProfilePage profile;
     private BooksPage booksPage;
-    private BooksPage menu;
 
     @BeforeEach
     public void setup() {
+        String chromeDriverPath = ConfigLoader.chromeDriverPath();
+        Path chromedriverFile = Paths.get(chromeDriverPath);
+        if (!Files.exists(chromedriverFile)) {
+            throw new RuntimeException("Chromedriver not found at: " + chromeDriverPath);
+        }
+
+        if (!Files.isRegularFile(chromedriverFile)) {
+            throw new RuntimeException("Chromedriver is not a regular file: " + chromeDriverPath);
+        }
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         driver = new ChromeDriver();
-        login = new LoginPage();
-        profile = new ProfilePage();
-        booksPage = new BooksPage();
-        menu = new BooksPage();
-        userCredentials = new UserCredentials(ConfigLoader.getUserName(), ConfigLoader.getPassword());
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        login = new LoginPage(driver);
+        profile = new ProfilePage(driver);
+        booksPage = new BooksPage(driver);
+        userCredentials = new UserCredentials(ConfigLoader.getUserName(), ConfigLoader.getPassword());
     }
 
     @AfterEach
     public void cleanup() {
         if (driver != null) {
-            ProfilePage.deleteAllBooks();
+            profile.deleteAllBooks();
             driver.manage().deleteAllCookies();
             driver.quit();
         }
@@ -51,12 +62,12 @@ public class QATests {
     @Test
     @DisplayName("Login and check the profile")
     @Description("Verify that the profile is empty after successful login")
-    @Tag("Scenario 1")
+    @Tag("Scenario_1")
     @Severity(SeverityLevel.CRITICAL)
     public void profileTest() {
         login.open();
-        login.enterUsername(ConfigLoader.getUserName());
-        login.enterPassword(ConfigLoader.getPassword());
+        login.enterUsername(userCredentials.getLoginName());
+        login.enterPassword(userCredentials.getSecretCode());
         login.clickLoginButton();
 
         step("Check that the profile has no books", () -> {
@@ -71,19 +82,19 @@ public class QATests {
     @DisplayName("Add 6 books in profile")
     @Description("Verify that added books are displayed in the user profile")
     @Severity(SeverityLevel.CRITICAL)
-    @Tag("Scenario 2")
+    @Tag("Scenario_2")
     public void displayAddedBooksTest() {
         login.open();
-        login.enterUsername(ConfigLoader.getUserName());
-        login.enterPassword(ConfigLoader.getPassword());
+        login.enterUsername(userCredentials.getLoginName());
+        login.enterPassword(userCredentials.getSecretCode());
         login.clickLoginButton();
-        menu.clickOnBookStore();
+        booksPage.clickOnBookStore();
 
         APIService.addBooksToUserProfile(booksPage.getAllIsbn(ConfigLoader.countBookAdd()));
 
         login.open();
-        login.enterUsername(ConfigLoader.getUserName());
-        login.enterPassword(ConfigLoader.getPassword());
+        login.enterUsername(userCredentials.getLoginName());
+        login.enterPassword(userCredentials.getSecretCode());
         login.clickLoginButton();
 
         step("Verify expected and displayed book count match", () -> {
@@ -98,19 +109,19 @@ public class QATests {
     @DisplayName("Successful add and delete books from profile")
     @Description("Verify adding and then deleting books from the user profile")
     @Severity(SeverityLevel.CRITICAL)
-    @Tag("Scenario 3")
+    @Tag("Scenario_3")
     public void addAndDeleteBooksTest() {
         login.open();
-        login.enterUsername(ConfigLoader.getUserName());
-        login.enterPassword(ConfigLoader.getPassword());
+        login.enterUsername(userCredentials.getLoginName());
+        login.enterPassword(userCredentials.getSecretCode());
         login.clickLoginButton();
-        menu.clickOnBookStore();
+        booksPage.clickOnBookStore();
 
         APIService.addBooksToUserProfile(booksPage.getAllIsbn(ConfigLoader.countBookAddAndDelete()));
 
         login.open();
-        login.enterUsername(ConfigLoader.getUserName());
-        login.enterPassword(ConfigLoader.getPassword());
+        login.enterUsername(userCredentials.getLoginName());
+        login.enterPassword(userCredentials.getSecretCode());
         login.clickLoginButton();
 
         step("Verify expected and displayed book count match", () -> {
@@ -120,7 +131,7 @@ public class QATests {
             );
         });
 
-        ProfilePage.deleteAllBooks();
+        profile.deleteAllBooks();
 
         step("Verify no books in profile after deletion", () -> {
             assertEquals(ConfigLoader.countBookInNewProfile(),

@@ -31,6 +31,9 @@ public class ConfigLoader {
     public static String getPassword() {
         return properties.getProperty("password");
     }
+    public static String chromeDriverPath() {
+        return properties.getProperty("chromeDriverPath");
+    }
     public static int countBookInNewProfile() {
         return Integer.parseInt(properties.getProperty("countBookInNewProfile"));
     }
