@@ -31,22 +31,17 @@ public class ConfigLoader {
     public static String getPassword() {
         return properties.getProperty("password");
     }
-    public static String chromeDriverPath() {
-        return properties.getProperty("chromeDriverPath");
+
+    public static String getUserId() {
+        return properties.getProperty("userId");
     }
+
     public static int countBookInNewProfile() {
         return Integer.parseInt(properties.getProperty("countBookInNewProfile"));
-    }
-    public static int countBookAdd() {
-        return Integer.parseInt(properties.getProperty("countBookAdd"));
     }
 
     public static int expectedCountBook() {
         return Integer.parseInt(properties.getProperty("expectedCountBook"));
-    }
-
-    public static int countBookAddAndDelete() {
-        return Integer.parseInt(properties.getProperty("countBookAddAndDelete"));
     }
 
     public static int expectedCountBookAddAndDelete() {

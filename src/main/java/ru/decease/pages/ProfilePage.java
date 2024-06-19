@@ -1,40 +1,51 @@
 package ru.decease.pages;
 
-import com.codeborne.selenide.Selenide;
-import io.qameta.allure.Attachment;
 import io.qameta.allure.Description;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
+import java.time.Duration;
+import java.util.List;
 
 public class ProfilePage {
-
-    private WebDriver driver;
+    private final WebDriver driver;
+    private final WebDriverWait wait;
 
     public ProfilePage(WebDriver driver) {
         this.driver = driver;
-    }
-
-    @Description("Check if the table is empty on the Profile page")
-    public boolean isTableEmpty() {
-        return $("#profile .rt-noData").exists();
-    }
-
-    @Description("Get the number of books in the Profile")
-    public int getBooksCount() {
-        return $$("#profile .rt-tr-group").size();
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
     }
 
     @Description("Delete all books on the Profile page")
-    public static void deleteAllBooks() {
-        $("#delete-record-undefined").click();
-        $("#closeSmallModal-ok").click();
+    public void deleteAllBooks() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
+        WebElement buttonDelete = new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()=\"Delete All Books\"]")));
+        js.executeScript("arguments[0].scrollIntoView(true);", buttonDelete);
+        buttonDelete.click();
+        driver.findElement(By.cssSelector("#closeSmallModal-ok")).click();
+        wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert2 = driver.switchTo().alert();
+        alert2.accept();
+
     }
 
-    @Attachment(value = "ScreenShot.png", fileExtension = ".png", type = "image/png")
-    private byte[] getPageScreen() {
-        return Selenide.screenshot(OutputType.BYTES);
+    @Description("Check if the table is empty on the Profile page")
+    public String isTableEmpty() {
+        return driver.findElement(By.cssSelector(".rt-noData")).getText();
+    }
+
+    public void setRow() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        WebElement buttonRow = new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(By.cssSelector("span.select-wrap.-pageSizeOptions")));
+        js.executeScript("arguments[0].scrollIntoView(true);", buttonRow);
+        buttonRow.click();
+        driver.findElement(By.cssSelector(".-pageSizeOptions > select > option:nth-child(2)")).click();
+    }
+
+    @Description("Get the number of books in the Profile")
+    public List<WebElement> getBooksCount() {
+        return driver.findElements(By.cssSelector(".rt-td img"));
     }
 }

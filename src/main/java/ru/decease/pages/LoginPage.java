@@ -1,51 +1,48 @@
 package ru.decease.pages;
 
-import com.codeborne.selenide.Selenide;
-import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
-import java.util.Arrays;
-
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.page;
-
 public class LoginPage {
-
-    private WebDriver driver;
+    private final WebDriver driver;
 
     public LoginPage(WebDriver driver) {
         this.driver = driver;
     }
 
     @Description("Open the login page")
-    public LoginPage open() {
-        Selenide.open("/login");
-        return this;
+    public void openPage() {
+        this.driver.get("https://demoqa.com/login");
     }
 
-    @Description("Enter username in the \"UserName\" field")
-    public LoginPage enterUsername(String username) {
-        $("#UserName").setValue(username);
-        return this;
+    @Description("Login")
+    public void loginStore(String user, String password) {
+        enterUser(user);
+        enterPassword(password);
+        clickLoginButton();
     }
 
-    @Description("Enter password in the \"Password\" field")
-    public LoginPage enterPassword(String password) {
-        $("#Password").setValue(password);
-        return this;
+    @Description("Enter username in the UserName field")
+    public void enterUser(String user) {
+
+        driver.findElement(By.cssSelector("#userName")).sendKeys(user);
     }
 
-    @Description("Click the \"Login\" button and attach a screenshot")
-    public ProfilePage clickLoginButton() {
-        $("#login").click();
-        attachScreenshot("Login");
-        return page(ProfilePage.class);
+    @Description("Enter password in the Password field")
+    public void enterPassword(String password) {
+        driver.findElement(By.cssSelector("#password")).sendKeys(password);
     }
 
-    private byte[] attachScreenshot(String name) {
-        byte[] screenshot = Selenide.screenshot(name).getBytes();
-        Allure.addAttachment(name, "image/png", Arrays.toString(screenshot));
-        return screenshot;
+    @Description("Click the Login button and attach a screenshot")
+    public void clickLoginButton() {
+        driver.findElement(By.cssSelector("#login")).click();
+        attachScreenshot();
+    }
+
+    private byte[] attachScreenshot() {
+        return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
     }
 }

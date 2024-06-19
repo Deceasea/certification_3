@@ -2,58 +2,42 @@ package ru.decease.utils;
 
 import io.qameta.allure.Description;
 import io.restassured.http.ContentType;
-import ru.decease.models.UserCredentials;
-
-import java.util.Collection;
+import ru.decease.models.Book;
 
 import static io.restassured.RestAssured.given;
 
 public class APIService {
-    private static String userId;
-    private static String login;
-    private static String password;
+    String userName;
+    String password;
 
-    public APIService(String login, String password) {
-        APIService.login = login;
-        APIService.password = password;
-        fetchUserId();
+    public APIService(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
     }
 
-    private void fetchUserId() {
-        userId = given()
-                .body(new UserCredentials(login, password))
-                .header("Accept", "application/json")
+    public static void deleteAllBooks() {
+        given()
+                .auth()
+                .preemptive()
+                .basic(ConfigLoader.getUserName(), ConfigLoader.getPassword())
                 .contentType(ContentType.JSON)
-                .when()
-                .post(ConfigLoader.getBaseUrl() + "/Account/v1/Login")
+                .header("Accept", ContentType.JSON.getAcceptHeader())
+                .delete(ConfigLoader.getBaseUrl() + "/BookStore/v1/Books?UserId=" + ConfigLoader.getUserId())
                 .then()
-                .contentType(ContentType.JSON)
-                .extract()
-                .path("userId");
+                .statusCode(204);
     }
 
     @Description("Add specified number of books to user profile")
-    public static void addBooksToUserProfile(Collection<String> isbnList) {
+    public void addBooksToUserProfile(Book.BookCollection books) {
         given()
                 .auth()
                 .preemptive()
-                .basic(login, password)
-                .body(new UserCredentials(userId, isbnList.toString()))
-                .header("Accept", "*/*")
+                .basic(ConfigLoader.getUserName(), ConfigLoader.getPassword())
                 .contentType(ContentType.JSON)
-                .when()
-                .post(ConfigLoader.getBaseUrl() + "/BookStore/v1/Books");
-    }
-
-    @Description("Delete all books from user profile")
-    public void deleteAllBooksFromUserProfile() {
-        given()
-                .auth()
-                .preemptive()
-                .basic(login, password)
-                .header("Accept", "*/*")
-                .contentType(ContentType.JSON)
-                .when()
-                .delete(ConfigLoader.getBaseUrl() + "/BookStore/v1/Books?UserId=" + userId);
+                .body(books)
+                .header("Accept", ContentType.JSON.getAcceptHeader())
+                .post(ConfigLoader.getBaseUrl() + "/BookStore/v1/Books")
+                .then()
+                .statusCode(201);
     }
 }
